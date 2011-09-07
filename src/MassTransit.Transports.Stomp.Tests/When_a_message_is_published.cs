@@ -46,7 +46,7 @@ namespace MassTransit.Transports.Stomp.Tests
         [Then]
         public void Should_be_received_by_the_queue()
         {
-            _received.WaitUntilCompleted(8.Seconds()).ShouldBeTrue();
+            _received.WaitUntilCompleted(3.Seconds()).ShouldBeTrue();
             _received.Value.StringA.ShouldEqual("ValueA");
         }
 
@@ -54,6 +54,5 @@ namespace MassTransit.Transports.Stomp.Tests
         {
             public string StringA { get; set; }
         }
-
     }
 }

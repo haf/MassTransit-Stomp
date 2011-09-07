@@ -19,10 +19,6 @@ namespace MassTransit.Transports.Stomp
     {
         public static ServiceBusConfigurator UseStomp(this ServiceBusConfigurator configurator)
         {
-            var busConfigurator = new PostCreateBusBuilderConfiguratorImpl(
-                bus => bus.AddService(BusServiceLayer.Network, new StompSubscriptionService()));
-
-            configurator.AddBusConfigurator(busConfigurator);
             configurator.UseJsonSerializer();
 
             return configurator.AddTransportFactory<StompTransportFactory>();
