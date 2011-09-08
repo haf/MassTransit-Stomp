@@ -15,7 +15,6 @@ namespace MassTransit.Transports.Stomp
 {
     using System;
     using Exceptions;
-    using log4net;
     using Magnum.Extensions;
     using Magnum.Threading;
 

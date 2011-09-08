@@ -20,7 +20,6 @@ namespace MassTransit.Transports.Stomp
         public static ServiceBusConfigurator UseStomp(this ServiceBusConfigurator configurator)
         {
             configurator.UseJsonSerializer();
-
             return configurator.AddTransportFactory<StompTransportFactory>();
         }
     }

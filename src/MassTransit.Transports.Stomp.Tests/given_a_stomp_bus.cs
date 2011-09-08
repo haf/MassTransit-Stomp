@@ -15,20 +15,20 @@ namespace MassTransit.Transports.Stomp.Tests
 {
     using System;
     using BusConfigurators;
+    using Magnum.TestFramework;
     using TestFramework.Fixtures;
     using Ultralight;
     using Ultralight.Listeners;
 
-    public class Given_a_stomp_bus
+    public class given_a_stomp_bus
         : LocalTestFixture<StompTransportFactory>
     {
-        protected Given_a_stomp_bus()
+        protected given_a_stomp_bus()
         {
             StompServer = new StompServer(new StompWsListener(new Uri("ws://localhost:8181")));
             StompServer.Start();
 
             LocalUri = new Uri("stomp://localhost:8181/test_queue");
-            LocalErrorUri = new Uri("stomp://localhost:8181/test_queue_error");
         }
 
         protected override void ConfigureServiceBus(Uri uri, ServiceBusConfigurator configurator)
@@ -36,7 +36,12 @@ namespace MassTransit.Transports.Stomp.Tests
             configurator.UseStomp();
         }
 
+        [After]
+        protected void Stop()
+        {
+            StompServer.Stop();
+        }
+
         protected readonly StompServer StompServer;
-        protected Uri LocalErrorUri { get; set; }
     }
 }

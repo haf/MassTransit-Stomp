@@ -20,8 +20,8 @@ namespace MassTransit.Transports.Stomp.Tests
     using TestFramework;
 
     [Scenario]
-    public class When_a_message_is_published :
-        Given_a_stomp_bus
+    public class message_publishing_on_a_single_bus 
+        : given_a_stomp_bus
     {
         private Future<A> _received;
 
@@ -30,7 +30,6 @@ namespace MassTransit.Transports.Stomp.Tests
             base.ConfigureServiceBus(uri, configurator);
 
             _received = new Future<A>();
-
             configurator.Subscribe(s => s.Handler<A>(message => _received.Complete(message)));
         }
 

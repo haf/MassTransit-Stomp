@@ -2,6 +2,22 @@ Stomp Transport for MassTransit
 ===============================
 This library adds a STOMP transport layer to the open source messaging project MassTransit. It was designed to enable messaging between different platforms. 
 
+# Note
+If you are using a seperate subscription service you should use a control bus to receive the subscription information:
+
+            var serviceBus = ServiceBusFactory
+                .New(sbc =>
+                         {
+                             sbc.UseSubscriptionService(_configuration.SubscriptionServiceUri);
+                             sbc.ReceiveFrom(_configuration.RuntimeServicesUri);
+                             sbc.UseStomp();
+                             sbc.UseControlBus();
+
+                             sbc.Subscribe(subs => subs.LoadFrom(_container));
+                         });
+						 
+Please check the included test fixtures for more details.
+
 # Example
 For a sample see the MassTransit-JS project.
 

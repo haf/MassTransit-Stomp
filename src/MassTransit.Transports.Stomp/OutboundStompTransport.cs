@@ -13,7 +13,6 @@
 
 namespace MassTransit.Transports.Stomp
 {
-    using System;
     using System.IO;
     using System.Text;
 
@@ -49,8 +48,7 @@ namespace MassTransit.Transports.Stomp
         }
 
         public void Dispose()
-        {
-            
+        {            
         }
     }
 }

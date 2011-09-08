@@ -22,7 +22,9 @@ namespace MassTransit.Transports.Stomp
                 Log.Warn("Subscribing to {0}".FormatWith(_address.Uri.PathAndQuery));
 
             connection.StompClient.Subscribe(_address.Uri.PathAndQuery);
-            connection.StompClient.WaitForSubscriptionConformation(_address.Uri.PathAndQuery);
+
+            //it's better to configure the message broker to persist messages until a new client connects
+            //connection.StompClient.WaitForSubscriptionConformation(_address.Uri.PathAndQuery);
         }
 
         public void Unbind(StompConnection connection)
