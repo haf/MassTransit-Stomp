@@ -60,7 +60,7 @@ namespace MassTransit.Transports.Stomp
                                  var context = ReceiveContext.FromBodyStream(body);
                                  context.SetMessageId(message["id"]);
                                  context.SetInputAddress(Address);
-
+                                 
                                  var receive = callback(context);
                                  if (receive == null)
                                  {

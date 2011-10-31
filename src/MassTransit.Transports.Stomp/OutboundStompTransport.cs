@@ -15,6 +15,7 @@ namespace MassTransit.Transports.Stomp
 {
     using System.IO;
     using System.Text;
+    using Context;
 
     public class OutboundStompTransport
         : IOutboundTransport
@@ -41,6 +42,7 @@ namespace MassTransit.Transports.Stomp
                              using (var body = new MemoryStream())
                              {
                                  context.SerializeTo(body);
+
                                  var msg = Encoding.UTF8.GetString(body.ToArray());
                                  connection.StompClient.Send(Address.Uri.PathAndQuery, msg);
                              }
