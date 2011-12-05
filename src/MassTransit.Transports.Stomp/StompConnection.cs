@@ -14,30 +14,44 @@
 namespace MassTransit.Transports.Stomp
 {
     using System;
-    using log4net;
+    using System.Collections.Concurrent;
     using Magnum.Extensions;
+    using Ultralight;
     using Ultralight.Client;
+    using log4net;
 
-    public class StompConnection :
-        Connection
+    public class StompConnection
+        : Connection
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof (StompConnection));
         private readonly Uri _address;
         private StompClient _stompClient;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StompConnection"/> class.
+        /// </summary>
+        /// <param name="address">The address.</param>
         public StompConnection(Uri address)
         {
             _address = address;
+            Messages = new ConcurrentQueue<StompMessage>();
         }
 
-        public StompClient StompClient
+        public ConcurrentQueue<StompMessage> Messages { get; set; }
+
+        public void Subscribe(string path)
         {
-            get { return _stompClient; }
+            _stompClient.Subscribe(path);
         }
 
-        public void Dispose()
+        public void Unsubscribe(string path)
         {
-            Disconnect();
+            _stompClient.Unsubscribe(path);
+        }
+
+        public void Send(string address, string message)
+        {
+            _stompClient.Send(address, message);
         }
 
         public void Connect()
@@ -49,30 +63,33 @@ namespace MassTransit.Transports.Stomp
             if (Log.IsInfoEnabled)
                 Log.Warn("Connecting {0}".FormatWith(_address));
 
-            _stompClient = new StompClient(cacheMessages: true);
-            _stompClient.Connect(serverAddress);
+            var absoluteUri = serverAddress.AbsoluteUri;
+
+            _stompClient = StompClientFactory.Build(absoluteUri);
+            _stompClient.OnMessage += m => Messages.Enqueue(m);
+            _stompClient.Connect();
         }
 
         public void Disconnect()
         {
             try
             {
-                if (_stompClient != null)
-                {
-                    if (Log.IsInfoEnabled)
-                        Log.Warn("Disconnecting {0}".FormatWith(_address));
+                if (_stompClient == null) return;
 
-                    if (_stompClient.IsConnected)
-                        _stompClient.Disconnect();
+                if (Log.IsInfoEnabled)
+                    Log.Warn("Disconnecting {0}".FormatWith(_address));
 
-                    _stompClient.Dispose();
-                    _stompClient = null;
-                }
+                if (_stompClient.IsConnected)
+                    _stompClient.Disconnect();
             }
             catch (Exception ex)
             {
                 Log.Warn("Failed to close STOMP connection.", ex);
             }
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

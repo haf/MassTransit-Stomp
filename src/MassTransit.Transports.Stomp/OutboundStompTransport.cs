@@ -44,7 +44,7 @@ namespace MassTransit.Transports.Stomp
                                  context.SerializeTo(body);
 
                                  var msg = Encoding.UTF8.GetString(body.ToArray());
-                                 connection.StompClient.Send(Address.Uri.PathAndQuery, msg);
+                                 connection.Send(Address.Uri.PathAndQuery, msg);
                              }
                          });
         }

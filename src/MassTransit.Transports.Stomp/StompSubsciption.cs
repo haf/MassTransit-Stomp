@@ -21,10 +21,7 @@ namespace MassTransit.Transports.Stomp
             if (Log.IsInfoEnabled)
                 Log.Warn("Subscribing to {0}".FormatWith(_address.Uri.PathAndQuery));
 
-            connection.StompClient.Subscribe(_address.Uri.PathAndQuery);
-
-            //it's better to configure the message broker to persist messages until a new client connects
-            //connection.StompClient.WaitForSubscriptionConformation(_address.Uri.PathAndQuery);
+            connection.Subscribe(_address.Uri.PathAndQuery);
         }
 
         public void Unbind(StompConnection connection)
@@ -32,7 +29,7 @@ namespace MassTransit.Transports.Stomp
             if (Log.IsInfoEnabled)
                 Log.Warn("Unsubscribing to {0}".FormatWith(_address.Uri.PathAndQuery));
 
-            connection.StompClient.Unsubscribe(_address.Uri.PathAndQuery);
+            connection.Unsubscribe(_address.Uri.PathAndQuery);
         }
     }
 }

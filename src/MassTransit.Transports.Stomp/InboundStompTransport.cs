@@ -49,7 +49,7 @@ namespace MassTransit.Transports.Stomp
                 .Use(connection =>
                          {
                              StompMessage message;
-                             if (!connection.StompClient.Messages.TryDequeue(out message))
+                             if (!connection.Messages.TryDequeue(out message))
                              {
                                  Thread.Sleep(10);
                                  return;

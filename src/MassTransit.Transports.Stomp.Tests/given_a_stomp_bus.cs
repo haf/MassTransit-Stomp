@@ -15,17 +15,18 @@ namespace MassTransit.Transports.Stomp.Tests
 {
     using System;
     using BusConfigurators;
+    using Configuration;
     using Magnum.TestFramework;
     using TestFramework.Fixtures;
     using Ultralight;
     using Ultralight.Listeners;
 
-    public class given_a_stomp_bus
+    public abstract class given_a_stomp_bus
         : LocalTestFixture<StompTransportFactory>
     {
         protected given_a_stomp_bus()
         {
-            StompServer = new StompServer(new StompWsListener(new Uri("ws://localhost:8181")));
+            StompServer = new StompServer(new StompWebsocketListener("ws://localhost:8181"));
             StompServer.Start();
 
             LocalUri = new Uri("stomp://localhost:8181/test_queue");

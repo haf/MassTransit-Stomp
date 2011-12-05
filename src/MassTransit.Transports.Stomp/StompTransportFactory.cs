@@ -85,7 +85,7 @@ namespace MassTransit.Transports.Stomp
         ConnectionHandler<StompConnection> GetConnection(IEndpointAddress address)
         {
             return _connectionCache.Retrieve(address.Uri, () =>
-            {
+            {                
                 var connection = new StompConnection(address.Uri);
                 var connectionHandler = new ConnectionHandlerImpl<StompConnection>(connection);
 

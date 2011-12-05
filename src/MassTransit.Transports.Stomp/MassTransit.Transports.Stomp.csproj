@@ -56,15 +56,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\StompBusConfigurationExtensions.cs" />
+    <Compile Include="StompClientFactory.cs" />
     <Compile Include="StompSubsciption.cs" />
     <Compile Include="StompConnection.cs" />
     <Compile Include="InboundStompTransport.cs" />
     <Compile Include="OutboundStompTransport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StompBusConfigurationExtensions.cs" />
-    <Compile Include="StompClientExtensions.cs" />
     <Compile Include="StompTransportFactory.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
