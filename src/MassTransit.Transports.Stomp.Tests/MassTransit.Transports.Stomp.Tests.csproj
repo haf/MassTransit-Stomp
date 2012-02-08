@@ -37,7 +37,7 @@
     <Reference Include="Magnum">
       <HintPath>..\..\lib\Magnum.dll</HintPath>
     </Reference>
-    <Reference Include="Magnum.TestFramework, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Magnum.TestFramework, Version=2.0.0.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\testing\Magnum.TestFramework.dll</HintPath>
     </Reference>
@@ -45,7 +45,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\MassTransit.dll</HintPath>
     </Reference>
-    <Reference Include="MassTransit.TestFramework, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MassTransit.TestFramework, Version=2.0.1.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\testing\MassTransit.TestFramework.dll</HintPath>
     </Reference>
@@ -70,6 +70,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EndpointFixture.cs" />
     <Compile Include="override_connection_to_in_memory_connection.cs" />
     <Compile Include="given_a_stomp_bus.cs" />
     <Compile Include="message_publishing_with_a_subscriptionservice.cs" />

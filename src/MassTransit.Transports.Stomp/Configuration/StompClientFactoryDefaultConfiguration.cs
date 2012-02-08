@@ -11,24 +11,28 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-namespace MassTransit.Transports.Stomp
+namespace MassTransit.Transports.Stomp.Configuration
 {
     using System;
     using Ultralight.Client;
+    using Ultralight.Client.Transport;
 
     /// <summary>
-    /// Builds a stomp client
+    /// Default <see cref="StompClientFactory"/> configuration settings
     /// </summary>
-    public class StompClientFactory
+    public class StompClientFactoryDefaultConfiguration
     {
-        public StompClientFactory(Func<string, StompClient> build)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StompClientFactoryDefaultConfiguration"/> class.
+        /// </summary>
+        public StompClientFactoryDefaultConfiguration()
         {
-            Build = build;
+            BuidMethod = adress => new StompClient(new WebTransportTransport(adress));
         }
 
         /// <summary>
-        ///   Builds a stomp client for connecting to the given address
+        /// Gets the buid method.
         /// </summary>
-        public Func<string, StompClient> Build { get; private set; }
+        public Func<string, StompClient> BuidMethod { get; private set; }
     }
 }

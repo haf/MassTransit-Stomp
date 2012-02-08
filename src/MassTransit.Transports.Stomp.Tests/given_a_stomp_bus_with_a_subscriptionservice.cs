@@ -17,13 +17,16 @@ namespace MassTransit.Transports.Stomp.Tests
     using BusConfigurators;
     using Configuration;
     using Magnum.TestFramework;
-    using TestFramework.Fixtures;
+    using Saga;
+    using Services.Subscriptions.Server;
     using Ultralight;
     using Ultralight.Listeners;
 
     public abstract class given_a_stomp_bus_with_a_subscriptionservice
-        : SubscriptionServiceTestFixture<StompTransportFactory>
+        : EndpointFixture
     {
+        protected readonly StompServer StompServer;
+
         protected given_a_stomp_bus_with_a_subscriptionservice()
         {
             StompServer = new StompServer(new StompWebsocketListener("ws://localhost:8181"));
@@ -32,13 +35,51 @@ namespace MassTransit.Transports.Stomp.Tests
             LocalUri = new Uri("stomp://localhost:8181/test_queue");
             RemoteUri = new Uri("stomp://localhost:8181/test_queue_control");
             SubscriptionUri = new Uri("stomp://localhost:8181/subscriptions");
+
+            SetupSubscriptionService();
+
+            LocalBus = SetupServiceBus(LocalUri);
+            RemoteBus = SetupServiceBus(RemoteUri);
         }
 
-        protected override void ConfigureServiceBus(Uri uri, ServiceBusConfigurator configurator)
+        protected IServiceBus RemoteBus { get; set; }
+        protected IServiceBus LocalBus { get; set; }
+        protected IServiceBus SubscriptionBus { get; set; }
+        protected SubscriptionService SubscriptionService { get; set; }
+
+        protected Uri SubscriptionUri { get; set; }
+        protected Uri RemoteUri { get; set; }
+        protected Uri LocalUri { get; set; }
+        protected InMemorySagaRepository<SubscriptionSaga> SubscriptionSagaRepository { get; private set; }
+        protected InMemorySagaRepository<SubscriptionClientSaga> SubscriptionClientSagaRepository { get; private set; }
+
+        protected virtual void ConfigureServiceBus(Uri uri, ServiceBusConfigurator configurator)
         {
             configurator.UseControlBus();
             configurator.UseStomp();
             configurator.UseSubscriptionService("stomp://localhost:8181/subscriptions");
+        }
+
+        private void SetupSubscriptionService()
+        {
+            SubscriptionClientSagaRepository = SetupSagaRepository<SubscriptionClientSaga>();
+            SubscriptionSagaRepository = SetupSagaRepository<SubscriptionSaga>();
+
+            SubscriptionBus = SetupServiceBus(SubscriptionUri, x => { x.SetConcurrentConsumerLimit(1); });
+
+            SubscriptionService = new SubscriptionService(SubscriptionBus,
+                                                          SubscriptionSagaRepository,
+                                                          SubscriptionClientSagaRepository);
+
+            SubscriptionService.Start();
+        }
+
+        protected static InMemorySagaRepository<TSaga> SetupSagaRepository<TSaga>()
+            where TSaga : class, ISaga
+        {
+            var sagaRepository = new InMemorySagaRepository<TSaga>();
+
+            return sagaRepository;
         }
 
         [After]
@@ -46,7 +87,5 @@ namespace MassTransit.Transports.Stomp.Tests
         {
             StompServer.Stop();
         }
-
-        protected readonly StompServer StompServer;
     }
 }

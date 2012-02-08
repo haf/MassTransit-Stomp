@@ -19,7 +19,6 @@ namespace MassTransit.Transports.Stomp.Tests
     using Magnum.Extensions;
     using Magnum.TestFramework;
     using TestFramework;
-    using TestFramework.Fixtures;
     using Ultralight;
     using Ultralight.Client;
     using Ultralight.Client.Transport;
@@ -27,7 +26,7 @@ namespace MassTransit.Transports.Stomp.Tests
 
     [Scenario]
     public class override_connection_to_in_memory_connection
-        : LocalTestFixture<StompTransportFactory>
+        : given_a_stomp_bus
     {
         public override_connection_to_in_memory_connection()
         {

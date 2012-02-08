@@ -11,24 +11,20 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-namespace MassTransit.Transports.Stomp
+namespace MassTransit.Transports.Stomp.Configuration.Builders
 {
-    using System;
-    using Ultralight.Client;
-
-    /// <summary>
-    /// Builds a stomp client
-    /// </summary>
-    public class StompClientFactory
+    public class StompClientFactoryBuilder
     {
-        public StompClientFactory(Func<string, StompClient> build)
+        private readonly StompClientFactoryConfigurationImpl _configurationImpl;
+
+        public StompClientFactoryBuilder(StompClientFactoryConfigurationImpl configurationImpl)
         {
-            Build = build;
+            _configurationImpl = configurationImpl;
         }
 
-        /// <summary>
-        ///   Builds a stomp client for connecting to the given address
-        /// </summary>
-        public Func<string, StompClient> Build { get; private set; }
+        public StompClientFactory Build()
+        {
+            return new StompClientFactory(_configurationImpl.BuidMethod);
+        }
     }
 }

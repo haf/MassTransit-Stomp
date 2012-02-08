@@ -15,61 +15,73 @@ namespace MassTransit.Transports.Stomp
 {
     using System;
     using System.Collections.Concurrent;
-    using Magnum.Extensions;
     using Ultralight;
     using Ultralight.Client;
     using log4net;
 
+    /// <summary>
+    /// Stompclient connection wrapper
+    /// </summary>
     public class StompConnection
         : Connection
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof (StompConnection));
-        private readonly Uri _address;
-        private StompClient _stompClient;
+        private readonly StompClient _stompClient;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StompConnection"/> class.
+        ///   Initializes a new instance of the <see cref="StompConnection" /> class.
         /// </summary>
-        /// <param name="address">The address.</param>
-        public StompConnection(Uri address)
+        /// <param name="stompClient"> The stomp client. </param>
+        public StompConnection(StompClient stompClient)
         {
-            _address = address;
             Messages = new ConcurrentQueue<StompMessage>();
+
+            _stompClient = stompClient;
+            _stompClient.OnMessage += m => Messages.Enqueue(m);
         }
 
         public ConcurrentQueue<StompMessage> Messages { get; set; }
 
-        public void Subscribe(string path)
+        /// <summary>
+        /// Subscribes to the specified destination.
+        /// </summary>
+        /// <param name="destination">The destination.</param>
+        public void Subscribe(string destination)
         {
-            _stompClient.Subscribe(path);
+            _stompClient.Subscribe(destination);
         }
 
-        public void Unsubscribe(string path)
+        /// <summary>
+        /// Unsubscribes from the specified destination.
+        /// </summary>
+        /// <param name="destination">The destination.</param>
+        public void Unsubscribe(string destination)
         {
-            _stompClient.Unsubscribe(path);
+            _stompClient.Unsubscribe(destination);
         }
 
-        public void Send(string address, string message)
+        /// <summary>
+        /// Sends the message to the specified destination.
+        /// </summary>
+        /// <param name="destination">The destination.</param>
+        /// <param name="message">The message.</param>
+        public void Send(string destination, string message)
         {
-            _stompClient.Send(address, message);
+            _stompClient.Send(destination, message);
         }
 
+        /// <summary>
+        /// Connects this instance.
+        /// </summary>
         public void Connect()
         {
             Disconnect();
-
-            var serverAddress = new UriBuilder("ws", _address.Host, _address.Port).Uri;
-
-            if (Log.IsInfoEnabled)
-                Log.Warn("Connecting {0}".FormatWith(_address));
-
-            var absoluteUri = serverAddress.AbsoluteUri;
-
-            _stompClient = StompClientFactory.Build(absoluteUri);
-            _stompClient.OnMessage += m => Messages.Enqueue(m);
             _stompClient.Connect();
         }
 
+        /// <summary>
+        /// Disconnects this instance.
+        /// </summary>
         public void Disconnect()
         {
             try
@@ -77,7 +89,7 @@ namespace MassTransit.Transports.Stomp
                 if (_stompClient == null) return;
 
                 if (Log.IsInfoEnabled)
-                    Log.Warn("Disconnecting {0}".FormatWith(_address));
+                    Log.Warn("Disconnecting");
 
                 if (_stompClient.IsConnected)
                     _stompClient.Disconnect();

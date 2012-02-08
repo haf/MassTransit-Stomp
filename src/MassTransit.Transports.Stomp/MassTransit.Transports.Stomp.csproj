@@ -56,7 +56,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\Builders\StompClientFactoryBuilder.cs" />
     <Compile Include="Configuration\StompBusConfigurationExtensions.cs" />
+    <Compile Include="Configuration\StompClientFactoryConfiguration.cs" />
+    <Compile Include="Configuration\StompClientFactoryConfigurationImpl.cs" />
+    <Compile Include="Configuration\StompClientFactoryDefaultConfiguration.cs" />
+    <Compile Include="StompConnectionFactory.cs" />
     <Compile Include="StompClientFactory.cs" />
     <Compile Include="StompSubsciption.cs" />
     <Compile Include="StompConnection.cs" />

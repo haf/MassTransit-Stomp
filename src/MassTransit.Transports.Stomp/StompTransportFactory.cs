@@ -22,8 +22,12 @@ namespace MassTransit.Transports.Stomp
         : ITransportFactory
     {
         private readonly ReaderWriterLockedDictionary<Uri, ConnectionHandler<StompConnection>> _connectionCache;
+        private StompConnectionFactory _connectionFactory;
         private bool _disposed;
 
+        /// <summary>
+        ///   Initializes a new instance of the <see cref="StompTransportFactory" /> class.
+        /// </summary>
         public StompTransportFactory()
         {
             _connectionCache = new ReaderWriterLockedDictionary<Uri, ConnectionHandler<StompConnection>>();
@@ -37,11 +41,16 @@ namespace MassTransit.Transports.Stomp
             get { return "stomp"; }
         }
 
+        public void SetConnectionFactory(StompConnectionFactory connectionFactory)
+        {
+            _connectionFactory = connectionFactory;
+        }
+
         /// <summary>
         ///   Builds the loopback.
         /// </summary>
-        /// <param name = "settings">The settings.</param>
-        /// <returns></returns>
+        /// <param name="settings"> The settings. </param>
+        /// <returns> </returns>
         public IDuplexTransport BuildLoopback(ITransportSettings settings)
         {
             return new Transport(settings.Address, () => BuildInbound(settings), () => BuildOutbound(settings));
@@ -74,7 +83,7 @@ namespace MassTransit.Transports.Stomp
         /// <summary>
         ///   Ensures the protocol is correct.
         /// </summary>
-        /// <param name = "address">The address.</param>
+        /// <param name="address"> The address. </param>
         private void EnsureProtocolIsCorrect(Uri address)
         {
             if (address.Scheme != Scheme)
@@ -82,18 +91,19 @@ namespace MassTransit.Transports.Stomp
                                             string.Format("Address must start with 'stomp' not '{0}'", address.Scheme));
         }
 
-        ConnectionHandler<StompConnection> GetConnection(IEndpointAddress address)
+        private ConnectionHandler<StompConnection> GetConnection(IEndpointAddress address)
         {
-            return _connectionCache.Retrieve(address.Uri, () =>
-            {                
-                var connection = new StompConnection(address.Uri);
-                var connectionHandler = new ConnectionHandlerImpl<StompConnection>(connection);
-
-                return connectionHandler;
-            });
+            return _connectionCache
+                .Retrieve(address.Uri,
+                          () =>
+                              {
+                                  var connection = _connectionFactory.Build(address.Uri);
+                                  var connectionHandler = new ConnectionHandlerImpl<StompConnection>(connection);
+                                  return connectionHandler;
+                              });
         }
 
-        void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (_disposed) return;
             if (disposing)
@@ -108,9 +118,9 @@ namespace MassTransit.Transports.Stomp
         }
 
         ~StompTransportFactory()
-		{
-			Dispose(false);
-		}
+        {
+            Dispose(false);
+        }
 
         public void Dispose()
         {

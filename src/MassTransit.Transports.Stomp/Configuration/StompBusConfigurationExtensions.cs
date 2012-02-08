@@ -14,29 +14,29 @@
 namespace MassTransit.Transports.Stomp.Configuration
 {
     using System;
+    using Builders;
     using BusConfigurators;
-    using Ultralight.Client;
-    using Ultralight.Client.Transport;
 
     public static class StompBusConfigurationExtensions
     {
         public static ServiceBusConfigurator UseStomp(this ServiceBusConfigurator configurator)
         {
-            return configurator.UseStomp(DefaultClientBuilder);
+            return configurator.UseStomp(x => { });
         }
 
-        public static ServiceBusConfigurator UseStomp(this ServiceBusConfigurator configurator, Func<string, StompClient> clientBuilder)
+        public static ServiceBusConfigurator UseStomp(this ServiceBusConfigurator configurator, Action<StompClientFactoryConfiguration> configure)
         {
-            StompClientFactory.Build = clientBuilder;
+            var factoryConfiguration = new StompClientFactoryConfigurationImpl(new StompClientFactoryDefaultConfiguration());
 
+            configure(factoryConfiguration);
+
+            var clientFactory = new StompClientFactoryBuilder(factoryConfiguration).Build();
+            var connectionFactory = new StompConnectionFactory(clientFactory);
+
+            configurator.AddTransportFactory<StompTransportFactory>(configureFactory => { configureFactory.SetConnectionFactory(connectionFactory); });
             configurator.UseJsonSerializer();
 
-            return configurator.AddTransportFactory<StompTransportFactory>();
-        }
-
-        private static StompClient DefaultClientBuilder(string adress)
-        {
-            return new StompClient(new WebTransportTransport(adress));
+            return configurator;
         }
     }
 }
