@@ -21,14 +21,18 @@ namespace MassTransit.Transports.Stomp
     /// </summary>
     public class StompClientFactory
     {
-        public StompClientFactory(Func<string, StompClient> build)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StompClientFactory"/> class.
+        /// </summary>
+        /// <param name="build">The client build method.</param>
+        public StompClientFactory(Func<Uri, StompClient> build)
         {
             Build = build;
         }
 
         /// <summary>
-        ///   Builds a stomp client for connecting to the given address
+        ///   Builds a <see cref="StompClient"/> for connecting to the given address
         /// </summary>
-        public Func<string, StompClient> Build { get; private set; }
+        public Func<Uri, StompClient> Build { get; private set; }
     }
 }

@@ -72,8 +72,8 @@
   <ItemGroup>
     <Compile Include="EndpointFixture.cs" />
     <Compile Include="override_connection_to_in_memory_connection.cs" />
-    <Compile Include="given_a_stomp_bus.cs" />
-    <Compile Include="message_publishing_with_a_subscriptionservice.cs" />
+    <Compile Include="given_a_stomp_server.cs" />
+    <Compile Include="message_publishing_between_two_busses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="message_publishing.cs" />
     <Compile Include="given_a_stomp_bus_with_a_subscriptionservice.cs" />

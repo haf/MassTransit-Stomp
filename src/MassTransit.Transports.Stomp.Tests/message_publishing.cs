@@ -15,22 +15,33 @@ namespace MassTransit.Transports.Stomp.Tests
 {
     using System;
     using BusConfigurators;
+    using Configuration;
     using Magnum.Extensions;
     using Magnum.TestFramework;
     using TestFramework;
 
     [Scenario]
     public class message_publishing 
-        : given_a_stomp_bus
+        : given_a_stomp_server
     {
         private Future<A> _received;
 
+        protected Uri LocalUri { get; set; }
+        protected IServiceBus LocalBus { get; set; }
+
+        public message_publishing()
+        {
+            LocalUri = new Uri("stomp://localhost:8181/test_queue");
+            LocalBus = SetupServiceBus(LocalUri);
+        }
+
         protected override void ConfigureServiceBus(Uri uri, ServiceBusConfigurator configurator)
         {
-            base.ConfigureServiceBus(uri, configurator);
-
             _received = new Future<A>();
+            
             configurator.Subscribe(s => s.Handler<A>(message => _received.Complete(message)));
+            configurator.UseControlBus();
+            configurator.UseStomp();
         }
 
         [When]

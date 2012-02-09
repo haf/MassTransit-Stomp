@@ -13,36 +13,32 @@
 
 namespace MassTransit.Transports.Stomp.Tests
 {
-    using System;
-    using BusConfigurators;
+    using System.Threading;
     using Magnum.Extensions;
     using Magnum.TestFramework;
     using TestFramework;
 
-    public class message_publishing_with_a_subscriptionservice
+    public class message_publishing_between_two_busses
         : given_a_stomp_bus_with_a_subscriptionservice
     {
         private Future<A> _received;
 
-        protected override void ConfigureServiceBus(Uri uri, ServiceBusConfigurator configurator)
-        {
-            base.ConfigureServiceBus(uri, configurator);
-
-            _received = new Future<A>();
-            configurator.Subscribe(s => s.Handler<A>(message => _received.Complete(message)));
-        }
-
         [When]
-        public void A_message_is_published()
+        public void A_message_is_published_one_the_local_bus()
         {
+            _received = new Future<A>();
+            RemoteBus.SubscribeHandler<A>(message => _received.Complete(message));
+
+            Thread.Sleep(3.Seconds());
+
             LocalBus.Publish(new A
-            {
-                StringA = "ValueA",
-            });
+                                 {
+                                     StringA = "ValueA",
+                                 });
         }
 
         [Then]
-        public void Should_be_received_by_the_queue()
+        public void Should_be_received_by_the_remote_queue()
         {
             _received.WaitUntilCompleted(3.Seconds()).ShouldBeTrue();
             _received.Value.StringA.ShouldEqual("ValueA");

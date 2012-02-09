@@ -21,6 +21,10 @@ namespace MassTransit.Transports.Stomp.Configuration
     /// </summary>
     public interface StompClientFactoryConfiguration
     {
-        void UseBuildMethod(Func<string, StompClient> buildMethod);
+        /// <summary>
+        /// Builds the new <see cref="StompClient"/> to connect to the given address
+        /// </summary>
+        /// <param name="buildMethod"></param>
+        void UseBuildMethod(Func<Uri, StompClient> buildMethod);
     }
 }

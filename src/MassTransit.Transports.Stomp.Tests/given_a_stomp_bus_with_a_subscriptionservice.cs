@@ -16,32 +16,12 @@ namespace MassTransit.Transports.Stomp.Tests
     using System;
     using BusConfigurators;
     using Configuration;
-    using Magnum.TestFramework;
     using Saga;
     using Services.Subscriptions.Server;
-    using Ultralight;
-    using Ultralight.Listeners;
 
     public abstract class given_a_stomp_bus_with_a_subscriptionservice
-        : EndpointFixture
+        : given_a_stomp_server
     {
-        protected readonly StompServer StompServer;
-
-        protected given_a_stomp_bus_with_a_subscriptionservice()
-        {
-            StompServer = new StompServer(new StompWebsocketListener("ws://localhost:8181"));
-            StompServer.Start();
-
-            LocalUri = new Uri("stomp://localhost:8181/test_queue");
-            RemoteUri = new Uri("stomp://localhost:8181/test_queue_control");
-            SubscriptionUri = new Uri("stomp://localhost:8181/subscriptions");
-
-            SetupSubscriptionService();
-
-            LocalBus = SetupServiceBus(LocalUri);
-            RemoteBus = SetupServiceBus(RemoteUri);
-        }
-
         protected IServiceBus RemoteBus { get; set; }
         protected IServiceBus LocalBus { get; set; }
         protected IServiceBus SubscriptionBus { get; set; }
@@ -53,11 +33,23 @@ namespace MassTransit.Transports.Stomp.Tests
         protected InMemorySagaRepository<SubscriptionSaga> SubscriptionSagaRepository { get; private set; }
         protected InMemorySagaRepository<SubscriptionClientSaga> SubscriptionClientSagaRepository { get; private set; }
 
-        protected virtual void ConfigureServiceBus(Uri uri, ServiceBusConfigurator configurator)
+        protected given_a_stomp_bus_with_a_subscriptionservice()
         {
-            configurator.UseControlBus();
+            LocalUri = new Uri("stomp://localhost:8181/test_queue_local");
+            RemoteUri = new Uri("stomp://localhost:8181/test_queue_remote");
+            SubscriptionUri = new Uri("stomp://localhost:8181/mt_subscriptions");
+
+            SetupSubscriptionService();
+
+            LocalBus = SetupServiceBus(LocalUri);
+            RemoteBus = SetupServiceBus(RemoteUri);
+        }
+
+        protected override void ConfigureServiceBus(Uri uri, ServiceBusConfigurator configurator)
+        {
             configurator.UseStomp();
-            configurator.UseSubscriptionService("stomp://localhost:8181/subscriptions");
+            configurator.UseControlBus();
+            configurator.UseSubscriptionService(SubscriptionUri);
         }
 
         private void SetupSubscriptionService()
@@ -65,7 +57,11 @@ namespace MassTransit.Transports.Stomp.Tests
             SubscriptionClientSagaRepository = SetupSagaRepository<SubscriptionClientSaga>();
             SubscriptionSagaRepository = SetupSagaRepository<SubscriptionSaga>();
 
-            SubscriptionBus = SetupServiceBus(SubscriptionUri, x => { x.SetConcurrentConsumerLimit(1); });
+            SubscriptionBus = SetupServiceBus(SubscriptionUri, x =>
+                                                                   {
+                                                                       x.UseStomp();
+                                                                       x.SetConcurrentConsumerLimit(1);
+                                                                   });
 
             SubscriptionService = new SubscriptionService(SubscriptionBus,
                                                           SubscriptionSagaRepository,
@@ -78,14 +74,7 @@ namespace MassTransit.Transports.Stomp.Tests
             where TSaga : class, ISaga
         {
             var sagaRepository = new InMemorySagaRepository<TSaga>();
-
             return sagaRepository;
-        }
-
-        [After]
-        public void Stop()
-        {
-            StompServer.Stop();
         }
     }
 }

@@ -27,12 +27,12 @@ namespace MassTransit.Transports.Stomp.Configuration
         /// </summary>
         public StompClientFactoryDefaultConfiguration()
         {
-            BuidMethod = adress => new StompClient(new WebTransportTransport(adress));
+            BuidMethod = adress => new StompClient(new WebTransportTransport(adress.ToString()));
         }
 
         /// <summary>
         /// Gets the buid method.
         /// </summary>
-        public Func<string, StompClient> BuidMethod { get; private set; }
+        public Func<Uri, StompClient> BuidMethod { get; private set; }
     }
 }

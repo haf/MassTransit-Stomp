@@ -34,13 +34,13 @@ namespace MassTransit.Transports.Stomp.Configuration
         /// <summary>
         /// Gets the buid method.
         /// </summary>
-        public Func<string, StompClient> BuidMethod { get; private set; }
+        public Func<Uri, StompClient> BuidMethod { get; private set; }
 
         /// <summary>
-        /// Override the default build method.
+        /// Builds the new <see cref="StompClient"/> to connect to the given address
         /// </summary>
-        /// <param name="buildMethod">The build method.</param>
-        public void UseBuildMethod(Func<string, StompClient> buildMethod)
+        /// <param name="buildMethod"></param>
+        public void UseBuildMethod(Func<Uri, StompClient> buildMethod)
         {
             BuidMethod = buildMethod;
         }

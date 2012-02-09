@@ -4,6 +4,9 @@
     using Magnum.Extensions;
     using log4net;
 
+    /// <summary>
+    /// Builds a <see cref="StompConnection"/>
+    /// </summary>
     public class StompConnectionFactory
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof (StompConnectionFactory));
@@ -19,6 +22,11 @@
             _clientFactory = clientFactory;
         }
 
+        /// <summary>
+        /// Builds the <see cref="StompConnection"/> to connect to the given location.
+        /// </summary>
+        /// <param name="location">The location.</param>
+        /// <returns></returns>
         public StompConnection Build(Uri location)
         {
             var serverAddress = new UriBuilder("ws", location.Host, location.Port).Uri;
@@ -26,9 +34,7 @@
             if (Log.IsInfoEnabled)
                 Log.Warn("Connecting {0}".FormatWith(location));
 
-            var absoluteUri = serverAddress.AbsoluteUri;
-
-            return new StompConnection(_clientFactory.Build(absoluteUri));
+            return new StompConnection(_clientFactory.Build(serverAddress));
         }
     }
 }

@@ -26,14 +26,19 @@ namespace MassTransit.Transports.Stomp.Tests
 
     [Scenario]
     public class override_connection_to_in_memory_connection
-        : given_a_stomp_bus
+        : EndpointFixture
     {
+        private readonly StompServer _stompServer;
+        private readonly StompInMemoryListener _inMemoryListener = new StompInMemoryListener();
+        private Future<A> _received;
+
         public override_connection_to_in_memory_connection()
         {
             _stompServer = new StompServer(_inMemoryListener);
             _stompServer.Start();
 
-            LocalUri = new Uri("stomp://localhost:8181/test_queue");
+            LocalUri = new Uri("stomp://in_memory/test_queue");
+            LocalBus = SetupServiceBus(LocalUri);
         }
 
         [After]
@@ -42,21 +47,21 @@ namespace MassTransit.Transports.Stomp.Tests
             _stompServer.Stop();
         }
 
-        private readonly StompServer _stompServer;
-        private readonly StompInMemoryListener _inMemoryListener = new StompInMemoryListener();
-        private Future<A> _received;
+        protected Uri LocalUri { get; set; }
+        protected IServiceBus LocalBus { get; set; }
 
         protected override void ConfigureServiceBus(Uri uri, ServiceBusConfigurator configurator)
         {
-            configurator.UseStomp(address => new StompClient(new InMemoryTransport(_inMemoryListener)));
-
-            _received = new Future<A>();
-            configurator.Subscribe(s => s.Handler<A>(message => _received.Complete(message)));
+            configurator.UseStomp(configuration => configuration.UseBuildMethod(address => new StompClient(new InMemoryTransport(_inMemoryListener))));
+           
         }
 
         [When]
         public void A_message_is_published()
         {
+            _received = new Future<A>();
+            LocalBus.SubscribeHandler<A>(message => _received.Complete(message));
+
             LocalBus.Publish(new A
                                  {
                                      StringA = "ValueA",

@@ -13,32 +13,26 @@
 
 namespace MassTransit.Transports.Stomp.Tests
 {
-    using System;
     using Magnum.TestFramework;
     using Ultralight;
     using Ultralight.Listeners;
 
-    public abstract class given_a_stomp_bus
+    public abstract class given_a_stomp_server
         : EndpointFixture
     {
-        protected given_a_stomp_bus()
+        protected given_a_stomp_server()
         {
             StompServer = new StompServer(new StompWebsocketListener("ws://localhost:8181"));
             StompServer.Start();
-
-            LocalUri = new Uri("stomp://localhost:8181/test_queue");
-            LocalBus = SetupServiceBus(LocalUri);
         }
-
-        protected Uri LocalUri { get; set; }
-        protected IServiceBus LocalBus { get; set; }
 
         [After]
         protected void Stop()
         {
             StompServer.Stop();
+            StompServer = null;
         }
 
-        protected readonly StompServer StompServer;
+        protected StompServer StompServer;
     }
 }

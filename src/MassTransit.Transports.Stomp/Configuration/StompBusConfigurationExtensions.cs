@@ -19,11 +19,22 @@ namespace MassTransit.Transports.Stomp.Configuration
 
     public static class StompBusConfigurationExtensions
     {
+        /// <summary>
+        /// Uses stomp as a transport channel.
+        /// </summary>
+        /// <param name="configurator">The servicebus configurator.</param>
+        /// <returns></returns>
         public static ServiceBusConfigurator UseStomp(this ServiceBusConfigurator configurator)
         {
             return configurator.UseStomp(x => { });
         }
 
+        /// <summary>
+        /// Uses stomp as a transport channel.
+        /// </summary>
+        /// <param name="configurator">The servicebus configurator.</param>
+        /// <param name="configure">Stomp transport configuration callback.</param>
+        /// <returns></returns>
         public static ServiceBusConfigurator UseStomp(this ServiceBusConfigurator configurator, Action<StompClientFactoryConfiguration> configure)
         {
             var factoryConfiguration = new StompClientFactoryConfigurationImpl(new StompClientFactoryDefaultConfiguration());
