@@ -14,35 +14,33 @@
 namespace MassTransit.Transports.Stomp.Configuration
 {
     using System;
-    using Builders;
     using BusConfigurators;
 
     public static class StompBusConfigurationExtensions
     {
         /// <summary>
-        /// Uses stomp as a transport channel.
+        ///   Uses stomp as a transport channel.
         /// </summary>
-        /// <param name="configurator">The servicebus configurator.</param>
-        /// <returns></returns>
+        /// <param name="configurator"> The servicebus configurator. </param>
+        /// <returns> </returns>
         public static ServiceBusConfigurator UseStomp(this ServiceBusConfigurator configurator)
         {
             return configurator.UseStomp(x => { });
         }
 
         /// <summary>
-        /// Uses stomp as a transport channel.
+        ///   Uses stomp as a transport channel.
         /// </summary>
-        /// <param name="configurator">The servicebus configurator.</param>
-        /// <param name="configure">Stomp transport configuration callback.</param>
-        /// <returns></returns>
-        public static ServiceBusConfigurator UseStomp(this ServiceBusConfigurator configurator, Action<StompClientFactoryConfiguration> configure)
+        /// <param name="configurator"> The servicebus configurator. </param>
+        /// <param name="configure"> Stomp transport configuration callback. </param>
+        /// <returns> </returns>
+        public static ServiceBusConfigurator UseStomp(this ServiceBusConfigurator configurator, Action<ConnectionFactoryConfigurator> configure)
         {
-            var factoryConfiguration = new StompClientFactoryConfigurationImpl(new StompClientFactoryDefaultConfiguration());
+            var factoryConfigurator = new ConnectionFactoryConfiguratorImpl(new ConnectionFactoryDefaultSettings());
 
-            configure(factoryConfiguration);
+            configure(factoryConfigurator);
 
-            var clientFactory = new StompClientFactoryBuilder(factoryConfiguration).Build();
-            var connectionFactory = new StompConnectionFactory(clientFactory);
+            var connectionFactory = factoryConfigurator.CreateStompClientFactory();
 
             configurator.AddTransportFactory<StompTransportFactory>(configureFactory => { configureFactory.SetConnectionFactory(connectionFactory); });
             configurator.UseJsonSerializer();

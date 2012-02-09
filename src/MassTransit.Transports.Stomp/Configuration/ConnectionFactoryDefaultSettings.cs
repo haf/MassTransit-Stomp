@@ -1,4 +1,4 @@
-// Copyright 2011 Ernst Naezer, et. al.
+﻿// Copyright 2011 Ernst Naezer, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -15,16 +15,24 @@ namespace MassTransit.Transports.Stomp.Configuration
 {
     using System;
     using Ultralight.Client;
+    using Ultralight.Client.Transport;
 
     /// <summary>
-    /// <see cref="StompClientFactory"/> configurator
+    /// Default <see cref="StompClientFactory"/> configuration settings
     /// </summary>
-    public interface StompClientFactoryConfiguration
+    public class ConnectionFactoryDefaultSettings
     {
         /// <summary>
-        /// Builds the new <see cref="StompClient"/> to connect to the given address
+        /// Initializes a new instance of the <see cref="ConnectionFactoryDefaultSettings"/> class.
         /// </summary>
-        /// <param name="buildMethod"></param>
-        void UseBuildMethod(Func<Uri, StompClient> buildMethod);
+        public ConnectionFactoryDefaultSettings()
+        {
+            BuidMethod = adress => new StompClient(new WebTransportTransport(adress.ToString()));
+        }
+
+        /// <summary>
+        /// Gets the buid method.
+        /// </summary>
+        public Func<Uri, StompClient> BuidMethod { get; set; }
     }
 }

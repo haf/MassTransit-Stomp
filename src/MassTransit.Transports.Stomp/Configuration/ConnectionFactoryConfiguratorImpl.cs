@@ -17,32 +17,34 @@ namespace MassTransit.Transports.Stomp.Configuration
     using Ultralight.Client;
 
     /// <summary>
-    /// Holds the configuration settings for <see cref="StompClientFactory"/>
+    ///   Holds the configuration settings for <see cref="StompClientFactory" />
     /// </summary>
-    public class StompClientFactoryConfigurationImpl 
-        : StompClientFactoryConfiguration
+    public class ConnectionFactoryConfiguratorImpl
+        : ConnectionFactoryConfigurator
     {
+        private readonly ConnectionFactorySettings _settings;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="StompClientFactoryConfigurationImpl"/> class.
+        ///   Initializes a new instance of the <see cref="ConnectionFactoryConfiguratorImpl" /> class.
         /// </summary>
-        /// <param name="defaultConfiguration">The default configuration.</param>
-        public StompClientFactoryConfigurationImpl(StompClientFactoryDefaultConfiguration defaultConfiguration)
+        /// <param name="defaultSettings"> The default configuration. </param>
+        public ConnectionFactoryConfiguratorImpl(ConnectionFactoryDefaultSettings defaultSettings)
         {
-            BuidMethod = defaultConfiguration.BuidMethod;
+            _settings = new ConnectionFactorySettings(defaultSettings);
         }
 
         /// <summary>
-        /// Gets the buid method.
+        ///   Builds the new <see cref="StompClient" /> to connect to the given address
         /// </summary>
-        public Func<Uri, StompClient> BuidMethod { get; private set; }
-
-        /// <summary>
-        /// Builds the new <see cref="StompClient"/> to connect to the given address
-        /// </summary>
-        /// <param name="buildMethod"></param>
+        /// <param name="buildMethod"> </param>
         public void UseBuildMethod(Func<Uri, StompClient> buildMethod)
         {
-            BuidMethod = buildMethod;
+            _settings.BuidMethod = buildMethod;
+        }
+
+        public StompConnectionFactory CreateStompClientFactory()
+        {
+            return new StompConnectionFactory(_settings.BuidMethod);
         }
     }
 }
