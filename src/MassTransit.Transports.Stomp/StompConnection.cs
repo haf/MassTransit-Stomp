@@ -76,6 +76,8 @@ namespace MassTransit.Transports.Stomp
         public void Connect()
         {
             Disconnect();
+
+            Log.Debug("Sending 'CONNECT' to server");
             _stompClient.Connect();
         }
 
@@ -88,11 +90,13 @@ namespace MassTransit.Transports.Stomp
             {
                 if (_stompClient == null) return;
 
-                if (Log.IsInfoEnabled)
-                    Log.Warn("Disconnecting");
-
                 if (_stompClient.IsConnected)
+                {
+                    if (Log.IsInfoEnabled)
+                        Log.Debug("Sending 'DISCONNECT' to server");
+
                     _stompClient.Disconnect();
+                }
             }
             catch (Exception ex)
             {
