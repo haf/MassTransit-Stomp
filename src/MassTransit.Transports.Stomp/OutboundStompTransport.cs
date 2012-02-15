@@ -15,7 +15,6 @@ namespace MassTransit.Transports.Stomp
 {
     using System.IO;
     using System.Text;
-    using Context;
 
     public class OutboundStompTransport
         : IOutboundTransport

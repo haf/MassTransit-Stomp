@@ -28,23 +28,13 @@ namespace MassTransit.Transports.Stomp.Tests
     public class override_connection_to_in_memory_connection
         : EndpointFixture
     {
-        private readonly StompServer _stompServer;
         private readonly StompInMemoryListener _inMemoryListener = new StompInMemoryListener();
         private Future<A> _received;
 
         public override_connection_to_in_memory_connection()
         {
-            _stompServer = new StompServer(_inMemoryListener);
-            _stompServer.Start();
-
             LocalUri = new Uri("stomp://in_memory/test_queue");
             LocalBus = SetupServiceBus(LocalUri);
-        }
-
-        [After]
-        protected void Stop()
-        {
-            _stompServer.Stop();
         }
 
         protected Uri LocalUri { get; set; }
@@ -52,8 +42,7 @@ namespace MassTransit.Transports.Stomp.Tests
 
         protected override void ConfigureServiceBus(Uri uri, ServiceBusConfigurator configurator)
         {
-            configurator.UseStomp(configuration => configuration.UseBuildMethod(address => new StompClient(new InMemoryTransport(_inMemoryListener))));
-           
+            configurator.UseStomp(configuration => configuration.UseBuildMethod(address => new StompClient(new InMemoryTransport(_inMemoryListener))));           
         }
 
         [When]
